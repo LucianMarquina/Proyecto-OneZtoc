@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.primaryColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primaryColor.withOpacity(0.2),
+                              color: AppTheme.primaryColor,
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -117,51 +117,43 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'OneZtoc',
+                      Text('OneZtoc', 
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryColor,
-                        ),
-                      ),
+                          fontSize: 38,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        )
+                      )
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 
 
                 Container(                  
-                  padding: const EdgeInsets.all(24),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [                      
-                    ],
-                  ),
+                  padding: const EdgeInsets.all(30),                  
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Título del formulario
+                      /* Título del formulario
                       const Text(
                         'Ingresa tus credenciales',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
-                      ),
+                      ), */
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 30),
 
                       // Label Client ID
                       const Text(
                         'Client ID',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
@@ -181,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintText: 'Ingresa tu Client ID',
                             hintStyle: TextStyle(
                               color: Colors.grey[400],
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -256,6 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
 
                       // Mensaje de error
+
                       if (_errorMessage != null) ...[
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -288,18 +281,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 20),
                       ],
 
                       // Botón de login
                       ElevatedButton(
                         onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.secondaryColor,
-                          foregroundColor: Colors.black54,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppTheme.tertiaryColor,                          
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),                          
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12),      
+                                                  
                           ),
                           elevation: 0,
                           disabledBackgroundColor: AppTheme.secondaryColor.withOpacity(0.6),
@@ -310,14 +304,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black54),
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                                 ),
                               )
                             : const Text(
                                 'Ingresar',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                       ),
@@ -335,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -349,8 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.primaryColor,
-                          decoration: TextDecoration.underline,
+                          color: AppTheme.secondaryColor,                                                    
                         ),
                       ),
                     ),

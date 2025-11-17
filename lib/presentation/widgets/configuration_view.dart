@@ -24,14 +24,23 @@ class _ConfigScreenState extends State<ConfigScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar',
+              style: TextStyle(
+                fontSize: 16
+              )
+            ),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
+            onPressed: () => Navigator.pop(context, true),            
+            style: ElevatedButton.styleFrom(              
+              backgroundColor: const Color(0xFFEF4444),  
+              
             ),
-            child: const Text('Cerrar Sesión'),
+            child: const Text('Cerrar Sesión',
+              style: TextStyle(
+                color: Colors.white
+              )
+            ),
           ),
         ],
       ),

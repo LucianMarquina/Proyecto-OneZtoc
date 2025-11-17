@@ -3,6 +3,7 @@ import 'package:one_ztoc_app/config/theme/app_theme.dart';
 import 'package:one_ztoc_app/presentation/widgets/scan_view.dart';
 import 'package:one_ztoc_app/presentation/widgets/historial_view.dart';
 import 'package:one_ztoc_app/presentation/widgets/configuration_view.dart';
+import 'package:one_ztoc_app/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,12 +15,26 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _totalCount = 0;
-  final GlobalKey<State> _historialKey = GlobalKey(); 
+  final GlobalKey<State> _historialKey = GlobalKey();
+  final AuthService _authService = AuthService();
+  String _userInitial = '';
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadUserInitial();
+  }
+
+  Future<void> _loadUserInitial() async {
+    final userData = await _authService.getUserData();
+    if (userData != null && mounted) {
+      setState(() {
+        _userInitial = userData['name'].toString().isNotEmpty
+            ? userData['name'].toString()[0].toUpperCase()
+            : 'U';
+      });
+    }
   }
 
   void _updateTotalCount(int count) {
@@ -52,22 +67,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: AppTheme.bgColor,
       appBar: AppBar(
-        toolbarHeight: 120,        
+        toolbarHeight: 120,
         leading: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: IconButton(onPressed: () {}, icon: Icon(Icons.document_scanner_outlined), iconSize: 50),
+          child: IconButton(onPressed: () {}, icon: const Icon(Icons.document_scanner_outlined), iconSize: 50),
         ),
         title: Padding(
-          padding: EdgeInsetsGeometry.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              Align(alignment: AlignmentGeometry.centerLeft, child: Text('Escáner de Productos',
+              Align(alignment: Alignment.centerLeft, child: const Text('Escáner de Productos',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 18)
                 ),
               ),
-              Align(alignment: AlignmentGeometry.bottomLeft, child: Text('Escanea código de barras',
+              Align(alignment: Alignment.bottomLeft, child: const Text('Escanea código de barras',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 18,
@@ -78,6 +93,32 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ],
           ),
         ),
+        actions: [
+          if (_userInitial.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Center(
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      _userInitial,
+                      style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
         
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(50), 

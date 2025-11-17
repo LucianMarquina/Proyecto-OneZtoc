@@ -30,13 +30,13 @@ class ActiveCaptureInfo extends StatelessWidget {
         children: [
           // Fila con ícono y texto de captura activa
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,            
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: AppTheme.secondaryColor,
                     shape: BoxShape.circle,
@@ -44,7 +44,7 @@ class ActiveCaptureInfo extends StatelessWidget {
                   child: const Icon(
                     Icons.library_add_check_rounded,
                     color: AppTheme.primaryColor,
-                    size: 35,
+                    size: 30,
                   ),
                 ),
                 const SizedBox(width: 12),

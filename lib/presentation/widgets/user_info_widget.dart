@@ -57,9 +57,9 @@ class UserInfoWidget extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                userRole,
+                'Inventariador',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
                 ),

@@ -4,7 +4,6 @@ import 'package:one_ztoc_app/models/scan_item.dart';
 import 'package:one_ztoc_app/models/scan_status.dart';
 import 'package:one_ztoc_app/presentation/widgets/scan_history_item.dart';
 import 'package:one_ztoc_app/presentation/widgets/stat_card.dart';
-import 'package:one_ztoc_app/presentation/screens/search_captures_screen.dart';
 import 'package:one_ztoc_app/services/database_service.dart';
 import 'package:one_ztoc_app/services/api_service.dart';
 
@@ -316,76 +315,42 @@ class _HistorialViewState extends State<HistorialView> {
           const SizedBox(height: 16),
 
           // Botones en una fila - mitad y mitad
-          Row(
-            children: [
-              // Botón "Buscar Capturas" - Mitad izquierda
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SearchCapturesScreen(),
+          // Botón "Enviar Pendientes" - Ancho completo
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isSyncing ? null : _sendPendingItems,
+              icon: _isSyncing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.search, size: 22),
-                  label: const Text(
-                    'Buscar Capturas',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppTheme.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
+                    )
+                  : const Icon(Icons.send_outlined, size: 18),
+              label: Text(
+                _isSyncing
+                    ? 'Enviando...'
+                    : 'Enviar Pendientes ($_pendingCount)',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 12),
-              // Botón "Enviar Pendientes" - Mitad derecha
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: _isSyncing ? null : _sendPendingItems,
-                  icon: _isSyncing
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Icon(Icons.send_outlined, size: 18),
-                  label: Text(
-                    _isSyncing
-                        ? 'Enviando...'
-                        : 'Enviar Pendientes ($_pendingCount)',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: (_pendingCount > 0 || _failedTemporaryCount > 0) && !_isSyncing
-                        ? AppTheme.primaryColor
-                        : const Color(0xFF64748B),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: (_pendingCount > 0 || _failedTemporaryCount > 0) && !_isSyncing
+                    ? AppTheme.primaryColor
+                    : const Color(0xFF64748B),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                elevation: 0,
               ),
-            ],
+            ),
           ),
 
           // Botón "Limpiar Errores" (solo si hay errores permanentes) - Ancho completo
