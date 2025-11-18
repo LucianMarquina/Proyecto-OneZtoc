@@ -137,7 +137,10 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
     }
   }
 
-  void _onCaptureSelected(String captureCode, Map<String, dynamic> captureData) {
+  void _onCaptureSelected(String captureCode, Map<String, dynamic> captureData) async {
+    // Registrar la captura validada inmediatamente en la base de datos
+    await _dbService.registerValidatedCapture(captureCode);
+
     setState(() {
       _captureSelected = true;
       _activeCaptureCode = captureCode;

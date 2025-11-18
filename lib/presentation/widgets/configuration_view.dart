@@ -475,7 +475,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
               ],
             ),
           ), */
-          SizedBox(height: 24),
+          SizedBox(height: 10),
           ElevatedButton.icon(
             onPressed: _isLoggingOut ? null : _handleLogout,
             icon: _isLoggingOut

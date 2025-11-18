@@ -380,6 +380,67 @@ class _HistorialViewState extends State<HistorialView> {
     }
   }
 
+  // Limpiar (eliminar) todos los códigos de una captura
+  Future<void> _limpiarCaptura(String captureName) async {
+    // Confirmación
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Limpiar Captura'),
+        content: Text(
+          '¿Estás seguro de eliminar todos los códigos de la captura "$captureName"?\n\n'
+          'Esta acción no se puede deshacer.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      // Eliminar todos los ítems de la captura
+      await _dbService.deleteItemsByCapture(captureName);
+
+      // Limpiar del cache
+      _captureItems.remove(captureName);
+
+      // Recargar capturas
+      await _loadCaptures();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✓ Captura "$captureName" eliminada'),
+          backgroundColor: AppTheme.primaryColor,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   // Método público para recargar desde el padre (cuando se escanea un nuevo código)
   void refresh() {
     _loadCaptures();
@@ -487,14 +548,18 @@ class _HistorialViewState extends State<HistorialView> {
       child: ExpansionTile(
         initiallyExpanded: false,
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        childrenPadding: const EdgeInsets.all(0),
+        childrenPadding: const EdgeInsets.all(0),  
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10)
+        ),
+        backgroundColor: Colors.white,      
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              decoration: BoxDecoration(                
                 color: AppTheme.bgColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.inventory_2,
@@ -519,7 +584,7 @@ class _HistorialViewState extends State<HistorialView> {
                   Text(
                     '$totalItems ítems escaneados',
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       color: Color(0xFF64748B),
                     ),
                   ),
@@ -559,7 +624,7 @@ class _HistorialViewState extends State<HistorialView> {
               if (items.isEmpty) {
                 return const Padding(
                   padding: EdgeInsets.all(24.0),
-                  child: Text('No hay ítems'),
+                  child: Text('No hay bienes escaneados'),
                 );
               }
 
@@ -567,7 +632,7 @@ class _HistorialViewState extends State<HistorialView> {
               final pending = items.where((i) => i.status == ScanStatus.pending).length;
               final sent = items.where((i) => i.status == ScanStatus.sent).length;
               final failedTemp = items.where((i) => i.status == ScanStatus.failed_temporary).length;
-              final failedPerm = items.where((i) => i.status == ScanStatus.failed_permanent).length;
+              // No mostramos errores permanentes al usuario (son errores del servidor)
 
               // Determinar si hay ítems pendientes por sincronizar
               final hasPendingItems = pending > 0 || failedTemp > 0;
@@ -582,7 +647,7 @@ class _HistorialViewState extends State<HistorialView> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildMiniStatCard('Pendientes', pending, ScanStatus.pending.color),
+                              child: _buildMiniStatCard('Pendientes', pending, ScanStatus.pending.color,),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -591,16 +656,35 @@ class _HistorialViewState extends State<HistorialView> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildMiniStatCard('Error Temp.', failedTemp, Colors.orange),
+                        // Solo mostrar "Reintentar" si hay errores temporales
+
+                        if (failedTemp > 0)
+                          _buildMiniStatCard('Reintentar', failedTemp, Colors.orange),
+
+                        // Botón "Limpiar Captura"
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _limpiarCaptura(captureName),
+                            icon: const Icon(Icons.delete_sweep_outlined, size: 20, color: Colors.white),
+                            label: const Text(
+                              'Limpiar Captura',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildMiniStatCard('Error Perm.', failedPerm, Colors.red),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red, width: 1.5),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -614,7 +698,7 @@ class _HistorialViewState extends State<HistorialView> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
-                      itemCount: items.length,
+                      itemCount: items.length,                  
                       itemBuilder: (context, index) {
                         return ScanHistoryItem(item: items[index]);
                       },
@@ -645,7 +729,7 @@ class _HistorialViewState extends State<HistorialView> {
                                   child: Text(
                                     'Todos los ítems ya fueron enviados',
                                     style: TextStyle(
-                                      fontSize: 13,
+                                      fontSize: 14,
                                       color: Colors.blue,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -688,7 +772,7 @@ class _HistorialViewState extends State<HistorialView> {
                                   ? AppTheme.primaryColor
                                   : Colors.grey,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -722,7 +806,7 @@ class _HistorialViewState extends State<HistorialView> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 15,
               color: color,
               fontWeight: FontWeight.w500,
             ),
@@ -730,7 +814,7 @@ class _HistorialViewState extends State<HistorialView> {
           Text(
             value.toString(),
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: color,
             ),

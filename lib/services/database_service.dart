@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:flutter/foundation.dart';
 import 'package:one_ztoc_app/models/scan_item.dart';
 import 'package:one_ztoc_app/models/scan_status.dart';
 
@@ -24,7 +25,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE scan_items(
@@ -46,6 +47,29 @@ class DatabaseService {
             errorMessage TEXT
           )
         ''');
+
+        // Tabla para registrar capturas validadas (aunque no tengan ítems)
+        await db.execute('''
+          CREATE TABLE validated_captures(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            captureName TEXT NOT NULL UNIQUE,
+            validatedAt TEXT NOT NULL,
+            captureData TEXT
+          )
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // Crear la nueva tabla de capturas validadas
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS validated_captures(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              captureName TEXT NOT NULL UNIQUE,
+              validatedAt TEXT NOT NULL,
+              captureData TEXT
+            )
+          ''');
+        }
       },
     );
   }
@@ -197,21 +221,59 @@ class DatabaseService {
   Future<void> clearDatabase() async {
     final db = await database;
     await db.delete('scan_items');
+    await db.delete('validated_captures');
   }
 
-  // Obtener capturas únicas registradas en la tabla local (NUEVO)
+  // Registrar una captura validada (aunque no tenga ítems aún)
+  Future<void> registerValidatedCapture(String captureName, {String? captureData}) async {
+    final db = await database;
+
+    try {
+      await db.insert(
+        'validated_captures',
+        {
+          'captureName': captureName,
+          'validatedAt': DateTime.now().toIso8601String(),
+          'captureData': captureData,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      // Si hay error (ej: captura duplicada), ignorar
+      debugPrint('Captura ya registrada: $captureName');
+    }
+  }
+
+  // Obtener capturas únicas registradas (incluye validadas sin ítems)
+  // Ordenadas por nombre ascendente (CAP-2025-00001, CAP-2025-00002, etc.)
   Future<List<Map<String, dynamic>>> getUniqueCaptures() async {
     final db = await database;
+
+    // Combinar capturas validadas con capturas que tienen ítems
     final List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT
-        captureName,
-        COUNT(*) as totalItems,
-        MIN(scannedAt) as firstScan,
-        MAX(scannedAt) as lastScan
-      FROM scan_items
-      WHERE captureName IS NOT NULL
-      GROUP BY captureName
-      ORDER BY lastScan DESC
+        COALESCE(v.captureName, s.captureName) as captureName,
+        COALESCE(COUNT(s.id), 0) as totalItems,
+        MIN(s.scannedAt) as firstScan,
+        MAX(s.scannedAt) as lastScan,
+        v.validatedAt
+      FROM validated_captures v
+      LEFT JOIN scan_items s ON v.captureName = s.captureName
+      GROUP BY v.captureName
+
+      UNION
+
+      SELECT
+        s.captureName as captureName,
+        COUNT(s.id) as totalItems,
+        MIN(s.scannedAt) as firstScan,
+        MAX(s.scannedAt) as lastScan,
+        NULL as validatedAt
+      FROM scan_items s
+      WHERE s.captureName NOT IN (SELECT captureName FROM validated_captures)
+      GROUP BY s.captureName
+
+      ORDER BY captureName ASC
     ''');
 
     return result;
@@ -250,11 +312,22 @@ class DatabaseService {
   // Eliminar todos los ítems de una captura específica (NUEVO)
   Future<int> deleteItemsByCapture(String captureName) async {
     final db = await database;
-    return await db.delete(
+
+    // Eliminar los ítems
+    final itemsDeleted = await db.delete(
       'scan_items',
       where: 'captureName = ?',
       whereArgs: [captureName],
     );
+
+    // Eliminar también de capturas validadas
+    await db.delete(
+      'validated_captures',
+      where: 'captureName = ?',
+      whereArgs: [captureName],
+    );
+
+    return itemsDeleted;
   }
 
   // Cerrar la base de datos

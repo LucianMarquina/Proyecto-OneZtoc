@@ -61,7 +61,7 @@ class ActiveCaptureInfo extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'CAP-$captureCode',
+                      captureCode,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

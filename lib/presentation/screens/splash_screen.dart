@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(
               width: 110,
               height: 110,              
-              child: Image.asset('assets/images/logo_one_ztoc.png')
+              child: Image.asset('assets/images/logo.png')
             ),            
             Text('OneZtoc', style: TextStyle(
                 fontSize: 38, fontWeight: FontWeight.w500, color: Colors.white,
