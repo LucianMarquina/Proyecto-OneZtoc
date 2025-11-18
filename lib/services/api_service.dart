@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:one_ztoc_app/models/faltante_item.dart';
+import 'package:one_ztoc_app/services/storage_service.dart';
 
 class ApiService {
   // URL hardcodeada para pruebas
@@ -8,24 +9,32 @@ class ApiService {
   static const String scanEndpoint = '/api/inventory/scan';
   static const String statsEndpoint = '/api/inventory/stats';
   static const String faltantesEndpoint = '/api/inventory/faltantes';
+  static const String validarCapturaEndpoint = '/api/inventory/validar-captura';
+  static const String verificarPendientesEndpoint = '/api/inventory/verificar-pendientes';
+  static const String marcarFaltantesEndpoint = '/api/inventory/marcar-faltantes';
 
-  // ID de empleado y captura para pruebas (se pueden cambiar después)
-  static const int? employeeId = null; // // Un ID específico (Future Developer)
-  static int? _currentCaptureId;
+  static final StorageService _storageService = StorageService();
 
-  static int? get currentCaptureId => _currentCaptureId;
-
-  // Escanear un código de barras
-  static Future<Map<String, dynamic>> scanBarcode(String barcode) async {
+  // Escanear un código de barras (AHORA RECIBE capture_code en lugar de capture_id)
+  static Future<Map<String, dynamic>> scanBarcode(String barcode, String captureCode) async {
     try {
       final url = Uri.parse('$baseUrl$scanEndpoint');
 
-      // Preparar el capture_id: si es null, enviarlo como null explícitamente
-      // El servidor ahora maneja null correctamente
+      // Obtener el token de acceso
+      final accessToken = await _storageService.getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Token de acceso no disponible',
+          'estado': 'error_auth',
+        };
+      }
+
       final Map<String, dynamic> params = {
+        'access_token': accessToken,
         'barcode': barcode,
-        'employee_id': employeeId,
-        'capture_id': _currentCaptureId,
+        'capture_code': captureCode,
       };
 
       final response = await http.post(
@@ -52,11 +61,6 @@ class ApiService {
         if (data.containsKey('result')) {
           final result = data['result'];
 
-          // Guardar el capture_id si viene en la respuesta
-          if (result['capture_id'] != null) {
-            _currentCaptureId = result['capture_id'];
-          }
-
           return {
             'success': result['success'] ?? false,
             'message': result['message'] ?? '',
@@ -64,6 +68,7 @@ class ApiService {
             'capture_id': result['capture_id'],
             'item_data': result['item_data'],
             'error_data': result['error_data'],
+            'error_code': result['error_code'],
           };
         } else if (data.containsKey('error')) {
           return {
@@ -94,10 +99,26 @@ class ApiService {
     }
   }
 
-  // Obtener estadísticas del inventario
-  static Future<Map<String, dynamic>> getStats() async {
+  // Validar si una captura existe en Odoo (NUEVO)
+  static Future<Map<String, dynamic>> validarCaptura(String captureCode) async {
     try {
-      final url = Uri.parse('$baseUrl$statsEndpoint');
+      final url = Uri.parse('$baseUrl$validarCapturaEndpoint');
+
+      // Obtener el token de acceso
+      final accessToken = await _storageService.getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Token de acceso no disponible',
+          'error_code': 'MISSING_TOKEN',
+        };
+      }
+
+      final Map<String, dynamic> params = {
+        'access_token': accessToken,
+        'capture_code': captureCode,
+      };
 
       final response = await http.post(
         url,
@@ -107,7 +128,232 @@ class ApiService {
         body: jsonEncode({
           'jsonrpc': '2.0',
           'method': 'call',
-          'params': {},
+          'params': params,
+        }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar con el servidor');
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data.containsKey('result')) {
+          final result = data['result'];
+          return {
+            'success': result['success'] ?? false,
+            'message': result['message'] ?? '',
+            'capture': result['capture'],
+            'employee': result['employee'],
+            'error_code': result['error_code'],
+          };
+        } else if (data.containsKey('error')) {
+          return {
+            'success': false,
+            'message': data['error']['message'] ?? 'Error desconocido',
+            'error_code': 'SERVER_ERROR',
+          };
+        } else {
+          return {
+            'success': false,
+            'message': 'Respuesta inválida del servidor',
+            'error_code': 'INVALID_RESPONSE',
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'message': 'Error del servidor: ${response.statusCode}',
+          'error_code': 'HTTP_ERROR',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error de conexión: ${e.toString()}',
+        'error_code': 'CONNECTION_ERROR',
+      };
+    }
+  }
+
+  // Verificar si quedan ítems pendientes (faltantes) en una captura (NUEVO)
+  static Future<Map<String, dynamic>> verificarPendientes(String captureCode) async {
+    try {
+      final url = Uri.parse('$baseUrl$verificarPendientesEndpoint');
+
+      // Obtener el token de acceso
+      final accessToken = await _storageService.getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Token de acceso no disponible',
+        };
+      }
+
+      final Map<String, dynamic> params = {
+        'access_token': accessToken,
+        'capture_code': captureCode,
+      };
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'call',
+          'params': params,
+        }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar con el servidor');
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data.containsKey('result')) {
+          final result = data['result'];
+          return {
+            'success': result['success'] ?? false,
+            'message': result['message'] ?? '',
+            'tiene_pendientes': result['tiene_pendientes'] ?? false,
+            'total_pendientes': result['total_pendientes'] ?? 0,
+            'capture_code': result['capture_code'],
+            'pendientes': result['pendientes'] ?? [],
+          };
+        } else if (data.containsKey('error')) {
+          return {
+            'success': false,
+            'message': data['error']['message'] ?? 'Error desconocido',
+          };
+        } else {
+          return {
+            'success': false,
+            'message': 'Respuesta inválida del servidor',
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'message': 'Error del servidor: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error de conexión: ${e.toString()}',
+      };
+    }
+  }
+
+  // Marcar todos los ítems pendientes como FALTANTES (NUEVO)
+  static Future<Map<String, dynamic>> marcarFaltantes(String captureCode) async {
+    try {
+      final url = Uri.parse('$baseUrl$marcarFaltantesEndpoint');
+
+      // Obtener el token de acceso
+      final accessToken = await _storageService.getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Token de acceso no disponible',
+        };
+      }
+
+      final Map<String, dynamic> params = {
+        'access_token': accessToken,
+        'capture_code': captureCode,
+      };
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'call',
+          'params': params,
+        }),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Timeout: No se pudo conectar con el servidor');
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data.containsKey('result')) {
+          final result = data['result'];
+          return {
+            'success': result['success'] ?? false,
+            'message': result['message'] ?? '',
+            'items_marcados': result['items_marcados'] ?? 0,
+            'capture_code': result['capture_code'],
+          };
+        } else if (data.containsKey('error')) {
+          return {
+            'success': false,
+            'message': data['error']['message'] ?? 'Error desconocido',
+          };
+        } else {
+          return {
+            'success': false,
+            'message': 'Respuesta inválida del servidor',
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'message': 'Error del servidor: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error de conexión: ${e.toString()}',
+      };
+    }
+  }
+
+  // Obtener estadísticas del inventario
+  static Future<Map<String, dynamic>> getStats() async {
+    try {
+      final url = Uri.parse('$baseUrl$statsEndpoint');
+
+      // Obtener el token de acceso
+      final accessToken = await _storageService.getAccessToken();
+
+      if (accessToken == null || accessToken.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Token de acceso no disponible',
+        };
+      }
+
+      final Map<String, dynamic> params = {
+        'access_token': accessToken,
+      };
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'call',
+          'params': params,
         }),
       ).timeout(
         const Duration(seconds: 10),
@@ -229,8 +475,4 @@ class ApiService {
     }
   }
 
-  // Reiniciar el capture_id (útil para pruebas)
-  static void resetCaptureId() {
-    _currentCaptureId = null;
-  }
 }

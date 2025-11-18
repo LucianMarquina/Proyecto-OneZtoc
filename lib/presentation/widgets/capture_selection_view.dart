@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:one_ztoc_app/config/theme/app_theme.dart';
+import 'package:one_ztoc_app/services/api_service.dart';
 
 class CaptureSelectionView extends StatefulWidget {
-  final Function(String) onCaptureSelected;
+  final Function(String, Map<String, dynamic>) onCaptureSelected;
 
   const CaptureSelectionView({
     super.key,
@@ -16,7 +17,7 @@ class CaptureSelectionView extends StatefulWidget {
 class _CaptureSelectionViewState extends State<CaptureSelectionView> {
   final TextEditingController _captureCodeController = TextEditingController();
   String? _errorMessage;
-  final String _validCaptureCode = '00001'; // Código válido de ejemplo
+  bool _isValidating = false;
 
   @override
   void dispose() {
@@ -24,29 +25,47 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
     super.dispose();
   }
 
-  void _handleSelectCapture() {
-    final captureCode = _captureCodeController.text.trim();
+  Future<void> _handleSelectCapture() async {
+    final inputCode = _captureCodeController.text.trim();
 
-    if (captureCode.isEmpty) {
+    if (inputCode.isEmpty) {
       setState(() {
-        _errorMessage = 'Por favor ingresa un código de captura';
+        _errorMessage = 'Por favor ingresa el código de captura';
       });
       return;
     }
 
-    // Validar el código de captura
-    if (captureCode == _validCaptureCode) {
-      // Código válido - limpiar error y navegar
-      setState(() {
-        _errorMessage = null;
-      });
+    setState(() {
+      _isValidating = true;
+      _errorMessage = null;
+    });
 
-      // Llamar al callback pasando el código de captura
-      widget.onCaptureSelected(captureCode);
-    } else {
-      // Código inválido - mostrar error
+    try {
+      // Construir el código completo: CAP-2025-XXXX
+      // El usuario solo ingresa el número (ej: 0002)
+      final fullCaptureCode = 'CAP-2025-$inputCode';
+
+      // Llamar al API para validar la captura con el código completo
+      final response = await ApiService.validarCaptura(fullCaptureCode);
+
+      if (!mounted) return;
+
+      if (response['success'] == true) {
+        // Captura válida - llamar al callback con el código completo y los datos
+        widget.onCaptureSelected(fullCaptureCode, response['capture']);
+      } else {
+        // Captura no encontrada o error
+        setState(() {
+          _errorMessage = response['message'] ?? 'Error al validar la captura';
+          _isValidating = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+
       setState(() {
-        _errorMessage = 'El codigo de captura ingresado no existe';
+        _errorMessage = 'Error de conexión: ${e.toString()}';
+        _isValidating = false;
       });
     }
   }
@@ -119,11 +138,25 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Codigo de captura',
+                    'Número de captura',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // Descripción del formato
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Se generará: CAP-2025-XXXX',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
                     ),
                   ),
                 ),
@@ -134,8 +167,10 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                 TextField(
                   controller: _captureCodeController,
                   keyboardType: TextInputType.number,
+                  maxLength: 5,
                   decoration: InputDecoration(
-                    hintText: 'Ej: 00004',
+                    hintText: 'Ej: 00001',
+                    counterText: '',
                     hintStyle: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 16,
@@ -207,7 +242,7 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _handleSelectCapture,
+                    onPressed: _isValidating ? null : _handleSelectCapture,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
                       foregroundColor: Colors.white,
@@ -217,13 +252,22 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Seleccionar Captura',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isValidating
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Validar Captura',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
           ],

@@ -20,6 +20,7 @@ class EscanearView extends StatefulWidget {
 class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClientMixin {
   bool _captureSelected = false; // Nueva variable para controlar si se seleccionó captura
   String _activeCaptureCode = ''; // Código de captura activo
+  Map<String, dynamic>? _activeCaptureData; // Datos completos de la captura
   bool _showManualInput = false;
   bool _cameraActive = false;
   MobileScannerController? _scannerController;
@@ -98,9 +99,13 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
         // Detener el escáner
         _deactivateCamera();
 
-        // Guardar el código en la base de datos local como PENDING
+        // Guardar el código en la base de datos local como PENDING con la captura activa
         try {
-          await _dbService.insertScanItem(code);
+          await _dbService.insertScanItem(
+            code,
+            captureCode: _activeCaptureCode,
+            captureName: _activeCaptureCode,
+          );
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +120,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
           // Notificar al padre que se completó un escaneo
           widget.onScanCompleted?.call();
 
-          debugPrint('Código guardado en BD local: $code');
+          debugPrint('Código guardado en BD local: $code (Captura: $_activeCaptureCode)');
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -132,17 +137,30 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
     }
   }
 
-  void _onCaptureSelected(String captureCode) {
+  void _onCaptureSelected(String captureCode, Map<String, dynamic> captureData) {
     setState(() {
       _captureSelected = true;
       _activeCaptureCode = captureCode;
+      _activeCaptureData = captureData;
     });
+
+    // Mostrar mensaje de éxito
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✓ Captura validada: $captureCode'),
+          backgroundColor: AppTheme.primaryColor,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _onChangeCapture() {
     setState(() {
       _captureSelected = false;
       _activeCaptureCode = '';
+      _activeCaptureData = null;
       // También cerrar la cámara si está activa
       if (_cameraActive) {
         _deactivateCamera();
@@ -217,6 +235,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
                         ? ManualCodeInputView(
                             onClose: _toggleManualInput,
                             onCodeSubmitted: widget.onScanCompleted,
+                            captureCode: _activeCaptureCode,
                           )
                         : _buildScanView()),
               ),

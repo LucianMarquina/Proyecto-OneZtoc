@@ -51,13 +51,15 @@ class DatabaseService {
   }
 
   // Insertar un nuevo código escaneado (siempre como PENDING)
-  Future<int> insertScanItem(String code) async {
+  // Ahora recibe captureCode y captureName para asociar el escaneo
+  Future<int> insertScanItem(String code, {String? captureCode, String? captureName}) async {
     final db = await database;
 
     final scanItem = ScanItem(
       code: code,
       status: ScanStatus.pending,
       scannedAt: DateTime.now(),
+      captureName: captureName ?? captureCode, // Usar el código como nombre si no se proporciona
     );
 
     return await db.insert('scan_items', scanItem.toMap());
@@ -92,7 +94,7 @@ class DatabaseService {
   }
 
   // Obtener códigos pendientes y con error TEMPORAL (para sincronización)
-  // IMPORTANTE: NO incluye failed_permanent ni sent
+  // No incluye failed_permanent ni sent
   Future<List<ScanItem>> getPendingAndErrorItems() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -195,6 +197,64 @@ class DatabaseService {
   Future<void> clearDatabase() async {
     final db = await database;
     await db.delete('scan_items');
+  }
+
+  // Obtener capturas únicas registradas en la tabla local (NUEVO)
+  Future<List<Map<String, dynamic>>> getUniqueCaptures() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT
+        captureName,
+        COUNT(*) as totalItems,
+        MIN(scannedAt) as firstScan,
+        MAX(scannedAt) as lastScan
+      FROM scan_items
+      WHERE captureName IS NOT NULL
+      GROUP BY captureName
+      ORDER BY lastScan DESC
+    ''');
+
+    return result;
+  }
+
+  // Obtener ítems filtrados por captura (NUEVO)
+  Future<List<ScanItem>> getItemsByCapture(String captureName) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'scan_items',
+      where: 'captureName = ?',
+      whereArgs: [captureName],
+      orderBy: 'scannedAt DESC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return ScanItem.fromMap(maps[i]);
+    });
+  }
+
+  // Obtener códigos pendientes y con error TEMPORAL filtrados por captura (NUEVO)
+  Future<List<ScanItem>> getPendingAndErrorItemsByCapture(String captureName) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'scan_items',
+      where: 'captureName = ? AND (status = ? OR status = ?)',
+      whereArgs: [captureName, ScanStatus.pending.name, ScanStatus.failed_temporary.name],
+      orderBy: 'scannedAt ASC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return ScanItem.fromMap(maps[i]);
+    });
+  }
+
+  // Eliminar todos los ítems de una captura específica (NUEVO)
+  Future<int> deleteItemsByCapture(String captureName) async {
+    final db = await database;
+    return await db.delete(
+      'scan_items',
+      where: 'captureName = ?',
+      whereArgs: [captureName],
+    );
   }
 
   // Cerrar la base de datos

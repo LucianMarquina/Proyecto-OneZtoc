@@ -5,11 +5,13 @@ import 'package:one_ztoc_app/services/database_service.dart';
 class ManualCodeInputView extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback? onCodeSubmitted;
+  final String? captureCode; // Código de captura activo
 
   const ManualCodeInputView({
     super.key,
     required this.onClose,
     this.onCodeSubmitted,
+    this.captureCode,
   });
 
   @override
@@ -45,8 +47,12 @@ class _ManualCodeInputViewState extends State<ManualCodeInputView> {
     try {
       final code = _codeController.text.trim();
 
-      // Guardar el código en la base de datos local como PENDING
-      await _dbService.insertScanItem(code);
+      // Guardar el código en la base de datos local como PENDING con la captura activa
+      await _dbService.insertScanItem(
+        code,
+        captureCode: widget.captureCode,
+        captureName: widget.captureCode,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -64,7 +70,7 @@ class _ManualCodeInputViewState extends State<ManualCodeInputView> {
         _codeController.clear();
       }
 
-      debugPrint('Código manual guardado en BD local: $code');
+      debugPrint('Código manual guardado en BD local: $code (Captura: ${widget.captureCode})');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
