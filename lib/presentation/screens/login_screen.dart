@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryColor,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -85,29 +85,15 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
-
-                // Título
-              
-                const SizedBox(height: 40),
+                const SizedBox(height: 100),
 
                 // Logo y nombre
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryColor,
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
+                      SizedBox(
+                        width: 250,
+                        height: 150,                      
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
@@ -116,20 +102,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text('OneZtoc', 
-                        style: TextStyle(
-                          fontSize: 38,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        )
-                      )
+                      const SizedBox(height: 10),                     
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 40),
-                
+                const SizedBox(height: 40),                
 
                 Container(                  
                   padding: const EdgeInsets.all(30),                  
@@ -155,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: Colors.black87,
                         ),
                       ),
 
@@ -168,23 +146,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextField(
-                          controller: _clientIdController,
+                          controller: _clientIdController,                          
                           decoration: InputDecoration(
                             hintText: 'Ingresa tu Client ID',
                             hintStyle: TextStyle(
-                              color: Colors.grey[400],
+                              color: Colors.grey[600],
                               fontSize: 16,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(12),                            
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
-                              vertical: 14,
+                              vertical: 16,
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Colors.white,                            
                           ),
                         ),
                       ),
@@ -192,18 +169,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
 
                       // Label Client Secret
+
                       const Text(
                         'Client Secret',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: Colors.black87,
                         ),
                       ),
 
                       const SizedBox(height: 10),
 
                       // Campo Client Secret
+
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -215,16 +194,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             hintText: 'Ingresa tu Client Secret',
                             hintStyle: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontSize: 16,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(12),      
+                              borderSide: BorderSide(
+                                color: AppTheme.secondaryColor
+                              )                      
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
-                              vertical: 14,
+                              vertical: 16,
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -288,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ElevatedButton(
                         onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.tertiaryColor,                          
+                          backgroundColor: AppTheme.secondaryColor,                          
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),                          
                           shape: RoundedRectangleBorder(
@@ -296,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   
                           ),
                           elevation: 0,
-                          disabledBackgroundColor: AppTheme.secondaryColor.withOpacity(0.6),
+                          disabledBackgroundColor: AppTheme.secondaryColor,
                         ),
                         child: _isLoading
                             ? const SizedBox(
@@ -329,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -343,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.secondaryColor,                                                    
+                          color: AppTheme.primaryColor,                                                    
                         ),
                       ),
                     ),

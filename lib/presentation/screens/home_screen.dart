@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgColor,
+      backgroundColor: Color.fromARGB(235, 248, 253, 255),
       appBar: AppBar(
         toolbarHeight: 120,
         leading: Padding(
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   width: 45,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.secondaryColor,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primaryColor,
+                        color: Colors.white,
                       ),
                     ),
                   ),

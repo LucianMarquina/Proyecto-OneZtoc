@@ -92,7 +92,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor,
+                  color: AppTheme.secondaryColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -278,7 +278,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: const BorderSide(
-                        color: Color(0xFF2D9B9B),
+                        color: AppTheme.primaryColor,
                         width: 2,
                       ),
                     ),
@@ -324,7 +324,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: const BorderSide(
-                        color: Color(0xFF2D9B9B),
+                        color: AppTheme.primaryColor,
                         width: 2,
                       ),
                     ),

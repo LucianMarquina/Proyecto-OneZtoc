@@ -224,7 +224,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
                 width: 440,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),                  
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0xFFE2E8F0),
@@ -323,13 +323,13 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
           width: 100,
           height: 100,
           decoration: const BoxDecoration(
-            color: AppTheme.bgColor,
+            color: AppTheme.secondaryColor,
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.document_scanner_outlined,
             size: 50,
-            color: AppTheme.primaryColor,
+            color: Colors.white,
           ),
         ),
 
@@ -376,7 +376,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
+              backgroundColor: AppTheme.secondaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -394,19 +394,20 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
           width: 300,
           child: OutlinedButton.icon(
             onPressed: _toggleManualInput,
-            icon: const Icon(Icons.keyboard, size: 20),
+            icon: const Icon(Icons.keyboard, size: 20, color: AppTheme.primaryColor,),
             label: const Text(
               'Ingresar Manualmente',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                color: AppTheme.primaryColor
               ),
             ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF1E293B),
+            style: OutlinedButton.styleFrom(                   
+              foregroundColor: const Color(0xFF1E293B),              
               padding: const EdgeInsets.symmetric(vertical: 14),
               side: const BorderSide(
-                color: Color(0xFFE2E8F0),
+                color: AppTheme.primaryColor,
                 width: 1.5,
               ),
               shape: RoundedRectangleBorder(

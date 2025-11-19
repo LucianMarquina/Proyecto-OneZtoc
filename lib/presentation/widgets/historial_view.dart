@@ -463,7 +463,7 @@ class _HistorialViewState extends State<HistorialView> {
                       Icon(
                         Icons.inventory_2_outlined,
                         size: 80,
-                        color: AppTheme.primaryColor,
+                        color: AppTheme.secondaryColor,
                       ),
                       SizedBox(height: 16),
                       Text(
@@ -479,7 +479,7 @@ class _HistorialViewState extends State<HistorialView> {
                         'Por favor, selecciona y valida una captura\nprimero en la pestaña "Escanear"',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF94A3B8),
+                          color: Color.fromARGB(255, 123, 135, 154),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -542,7 +542,7 @@ class _HistorialViewState extends State<HistorialView> {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: Color(0xFFE2E8F0)),
       ),
       child: ExpansionTile(
@@ -550,7 +550,7 @@ class _HistorialViewState extends State<HistorialView> {
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         childrenPadding: const EdgeInsets.all(0),  
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10)
+          borderRadius: BorderRadius.circular(20)
         ),
         backgroundColor: Colors.white,      
         title: Row(
@@ -558,13 +558,13 @@ class _HistorialViewState extends State<HistorialView> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(                
-                color: AppTheme.bgColor,
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.secondaryColor,
+                borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.inventory_2,
-                color: AppTheme.primaryColor,
-                size: 24,
+                color: Colors.white,
+                size: 22,
               ),
             ),
             const SizedBox(width: 12),
@@ -769,7 +769,7 @@ class _HistorialViewState extends State<HistorialView> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: hasPendingItems
-                                  ? AppTheme.primaryColor
+                                  ? AppTheme.secondaryColor
                                   : Colors.grey,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 10),

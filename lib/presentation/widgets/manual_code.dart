@@ -124,13 +124,13 @@ class _ManualCodeInputViewState extends State<ManualCodeInputView> {
             width: 100,
             height: 100,
             decoration: const BoxDecoration(
-              color: AppTheme.bgColor,
+              color: AppTheme.secondaryColor,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.manage_search_outlined,
               size: 55,
-              color: AppTheme.primaryColor,
+              color: Colors.white,
             ),
           ),
           SizedBox(height: 20),          
@@ -165,7 +165,7 @@ class _ManualCodeInputViewState extends State<ManualCodeInputView> {
           ElevatedButton(
             onPressed: _isLoading ? null : _searchProduct,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
+              backgroundColor: AppTheme.secondaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(

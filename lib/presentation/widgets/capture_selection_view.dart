@@ -95,13 +95,13 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                   width: 90,
                   height: 90,
                   decoration: const BoxDecoration(
-                    color: AppTheme.bgColor,
+                    color: AppTheme.secondaryColor,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.inventory_2_outlined,
                     size: 45,
-                    color: AppTheme.primaryColor,
+                    color: Colors.white,
                   ),
                 ),
 
@@ -244,7 +244,7 @@ class _CaptureSelectionViewState extends State<CaptureSelectionView> {
                   child: ElevatedButton(
                     onPressed: _isValidating ? null : _handleSelectCapture,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryColor,
+                      backgroundColor: AppTheme.secondaryColor,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(

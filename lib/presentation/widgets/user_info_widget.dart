@@ -38,7 +38,7 @@ class UserInfoWidget extends StatelessWidget {
             ),
             child: const Icon(
               Icons.person,
-              color: AppTheme.primaryColor,
+              color: Colors.white,
               size: 28,
             ),
           ),
@@ -59,7 +59,7 @@ class UserInfoWidget extends StatelessWidget {
               Text(
                 'Inventariador',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
                 ),

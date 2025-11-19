@@ -41,20 +41,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryColor,
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 110,
-              height: 110,              
+              width: 250,
+              height: 250,              
               child: Image.asset('assets/images/logo.png')
-            ),            
-            Text('OneZtoc', style: TextStyle(
-                fontSize: 38, fontWeight: FontWeight.w500, color: Colors.white,
-              )
-            )
+            ),                       
           ],
         ),
       ),
