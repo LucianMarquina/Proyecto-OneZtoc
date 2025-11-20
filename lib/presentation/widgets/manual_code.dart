@@ -6,12 +6,14 @@ class ManualCodeInputView extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback? onCodeSubmitted;
   final String? captureCode; // Código de captura activo
+  final int employeeId; // ID del empleado
 
   const ManualCodeInputView({
     super.key,
     required this.onClose,
     this.onCodeSubmitted,
     this.captureCode,
+    required this.employeeId,
   });
 
   @override
@@ -52,6 +54,7 @@ class _ManualCodeInputViewState extends State<ManualCodeInputView> {
         code,
         captureCode: widget.captureCode,
         captureName: widget.captureCode,
+        employeeId: widget.employeeId,
       );
 
       if (mounted) {

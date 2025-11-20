@@ -5,6 +5,7 @@ import 'package:one_ztoc_app/models/scan_status.dart';
 import 'package:one_ztoc_app/presentation/widgets/scan_history_item.dart';
 import 'package:one_ztoc_app/services/database_service.dart';
 import 'package:one_ztoc_app/services/api_service.dart';
+import 'package:one_ztoc_app/services/auth_service.dart';
 
 class HistorialView extends StatefulWidget {
   final Function(int) onTotalCountChanged;
@@ -20,29 +21,41 @@ class HistorialView extends StatefulWidget {
 
 class _HistorialViewState extends State<HistorialView> {
   final DatabaseService _dbService = DatabaseService();
+  final AuthService _authService = AuthService();
   List<Map<String, dynamic>> _captures = [];
   Map<String, List<ScanItem>> _captureItems = {};
   bool _isLoading = true;
   String? _syncingCapture; // Captura que se está sincronizando actualmente
+  int? _employeeId; // ID del empleado logueado
 
   int get _totalCount => _captureItems.values.fold(0, (sum, items) => sum + items.length);
 
   @override
   void initState() {
     super.initState();
-    _loadCaptures();
+    _loadEmployeeId();
+  }
+
+  Future<void> _loadEmployeeId() async {
+    final userData = await _authService.getUserData();
+    if (userData != null && mounted) {
+      setState(() {
+        _employeeId = userData['id'];
+      });
+      _loadCaptures();
+    }
   }
 
   // Cargar todas las capturas únicas desde la base de datos local
   Future<void> _loadCaptures() async {
-    if (!mounted) return;
+    if (!mounted || _employeeId == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final captures = await _dbService.getUniqueCaptures();
+      final captures = await _dbService.getUniqueCaptures(employeeId: _employeeId!);
 
       if (!mounted) return;
 
@@ -71,8 +84,10 @@ class _HistorialViewState extends State<HistorialView> {
       return _captureItems[captureName]!;
     }
 
+    if (_employeeId == null) return [];
+
     try {
-      final items = await _dbService.getItemsByCapture(captureName);
+      final items = await _dbService.getItemsByCapture(captureName, employeeId: _employeeId!);
 
       if (!mounted) return items;
 
@@ -90,10 +105,12 @@ class _HistorialViewState extends State<HistorialView> {
   // IMPORTANTE: Solo sincroniza ítems con estado "pending" o "failed_temporary"
   // Los ítems con estado "sent" (enviados) se ignoran completamente
   Future<bool> _syncCaptureItems(String captureName) async {
+    if (_employeeId == null) return false;
+
     try {
       // Obtener SOLO los ítems que necesitan sincronización (pending y failed_temporary)
       // Los ítems "sent" NO se incluyen aquí
-      final itemsToSync = await _dbService.getPendingAndErrorItemsByCapture(captureName);
+      final itemsToSync = await _dbService.getPendingAndErrorItemsByCapture(captureName, employeeId: _employeeId!);
 
       if (itemsToSync.isEmpty) {
         // No hay nada pendiente por sincronizar
@@ -341,8 +358,8 @@ class _HistorialViewState extends State<HistorialView> {
         ),
       );
 
-      if (limpiar == true) {
-        await _dbService.deleteItemsByCapture(captureName);
+      if (limpiar == true && _employeeId != null) {
+        await _dbService.deleteItemsByCapture(captureName, employeeId: _employeeId!);
       }
 
       if (!mounted) return;
@@ -410,9 +427,11 @@ class _HistorialViewState extends State<HistorialView> {
 
     if (confirm != true) return;
 
+    if (_employeeId == null) return;
+
     try {
       // Eliminar solo los ítems/códigos, mantener la captura
-      await _dbService.deleteOnlyItemsByCapture(captureName);
+      await _dbService.deleteOnlyItemsByCapture(captureName, employeeId: _employeeId!);
 
       // Limpiar del cache
       _captureItems.remove(captureName);

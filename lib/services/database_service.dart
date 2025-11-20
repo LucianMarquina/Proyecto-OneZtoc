@@ -25,7 +25,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE scan_items(
@@ -44,7 +44,8 @@ class DatabaseService {
             captureId TEXT,
             captureName TEXT,
             estado TEXT,
-            errorMessage TEXT
+            errorMessage TEXT,
+            employeeId INTEGER NOT NULL
           )
         ''');
 
@@ -52,9 +53,11 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE validated_captures(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            captureName TEXT NOT NULL UNIQUE,
+            captureName TEXT NOT NULL,
             validatedAt TEXT NOT NULL,
-            captureData TEXT
+            captureData TEXT,
+            employeeId INTEGER NOT NULL,
+            UNIQUE(captureName, employeeId)
           )
         ''');
       },
@@ -70,13 +73,41 @@ class DatabaseService {
             )
           ''');
         }
+
+        if (oldVersion < 3) {
+          // Agregar employeeId a ambas tablas
+          await db.execute('ALTER TABLE scan_items ADD COLUMN employeeId INTEGER DEFAULT 0');
+          await db.execute('ALTER TABLE validated_captures ADD COLUMN employeeId INTEGER DEFAULT 0');
+
+          // Eliminar constraint UNIQUE anterior y crear uno nuevo que incluya employeeId
+          // SQLite no soporta DROP CONSTRAINT, así que recreamos la tabla
+          await db.execute('''
+            CREATE TABLE validated_captures_new(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              captureName TEXT NOT NULL,
+              validatedAt TEXT NOT NULL,
+              captureData TEXT,
+              employeeId INTEGER NOT NULL,
+              UNIQUE(captureName, employeeId)
+            )
+          ''');
+
+          await db.execute('''
+            INSERT INTO validated_captures_new (id, captureName, validatedAt, captureData, employeeId)
+            SELECT id, captureName, validatedAt, captureData, COALESCE(employeeId, 0)
+            FROM validated_captures
+          ''');
+
+          await db.execute('DROP TABLE validated_captures');
+          await db.execute('ALTER TABLE validated_captures_new RENAME TO validated_captures');
+        }
       },
     );
   }
 
   // Insertar un nuevo código escaneado (siempre como PENDING)
-  // Ahora recibe captureCode y captureName para asociar el escaneo
-  Future<int> insertScanItem(String code, {String? captureCode, String? captureName}) async {
+  // Ahora recibe captureCode, captureName y employeeId para asociar el escaneo
+  Future<int> insertScanItem(String code, {String? captureCode, String? captureName, required int employeeId}) async {
     final db = await database;
 
     final scanItem = ScanItem(
@@ -84,6 +115,7 @@ class DatabaseService {
       status: ScanStatus.pending,
       scannedAt: DateTime.now(),
       captureName: captureName ?? captureCode, // Usar el código como nombre si no se proporciona
+      employeeId: employeeId,
     );
 
     return await db.insert('scan_items', scanItem.toMap());
@@ -225,7 +257,7 @@ class DatabaseService {
   }
 
   // Registrar una captura validada (aunque no tenga ítems aún)
-  Future<void> registerValidatedCapture(String captureName, {String? captureData}) async {
+  Future<void> registerValidatedCapture(String captureName, {String? captureData, required int employeeId}) async {
     final db = await database;
 
     try {
@@ -235,21 +267,22 @@ class DatabaseService {
           'captureName': captureName,
           'validatedAt': DateTime.now().toIso8601String(),
           'captureData': captureData,
+          'employeeId': employeeId,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
       // Si hay error (ej: captura duplicada), ignorar
-      debugPrint('Captura ya registrada: $captureName');
+      debugPrint('Captura ya registrada: $captureName para empleado $employeeId');
     }
   }
 
   // Obtener capturas únicas registradas (incluye validadas sin ítems)
-  // Ordenadas por nombre ascendente (CAP-2025-00001, CAP-2025-00002, etc.)
-  Future<List<Map<String, dynamic>>> getUniqueCaptures() async {
+  // Filtradas por employeeId y ordenadas por nombre ascendente
+  Future<List<Map<String, dynamic>>> getUniqueCaptures({required int employeeId}) async {
     final db = await database;
 
-    // Combinar capturas validadas con capturas que tienen ítems
+    // Combinar capturas validadas con capturas que tienen ítems, filtradas por employeeId
     final List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT
         COALESCE(v.captureName, s.captureName) as captureName,
@@ -258,7 +291,8 @@ class DatabaseService {
         MAX(s.scannedAt) as lastScan,
         v.validatedAt
       FROM validated_captures v
-      LEFT JOIN scan_items s ON v.captureName = s.captureName
+      LEFT JOIN scan_items s ON v.captureName = s.captureName AND s.employeeId = ?
+      WHERE v.employeeId = ?
       GROUP BY v.captureName
 
       UNION
@@ -270,22 +304,25 @@ class DatabaseService {
         MAX(s.scannedAt) as lastScan,
         NULL as validatedAt
       FROM scan_items s
-      WHERE s.captureName NOT IN (SELECT captureName FROM validated_captures)
+      WHERE s.employeeId = ?
+        AND s.captureName NOT IN (
+          SELECT captureName FROM validated_captures WHERE employeeId = ?
+        )
       GROUP BY s.captureName
 
       ORDER BY captureName ASC
-    ''');
+    ''', [employeeId, employeeId, employeeId, employeeId]);
 
     return result;
   }
 
-  // Obtener ítems filtrados por captura (NUEVO)
-  Future<List<ScanItem>> getItemsByCapture(String captureName) async {
+  // Obtener ítems filtrados por captura y employeeId
+  Future<List<ScanItem>> getItemsByCapture(String captureName, {required int employeeId}) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'scan_items',
-      where: 'captureName = ?',
-      whereArgs: [captureName],
+      where: 'captureName = ? AND employeeId = ?',
+      whereArgs: [captureName, employeeId],
       orderBy: 'scannedAt DESC',
     );
 
@@ -294,13 +331,13 @@ class DatabaseService {
     });
   }
 
-  // Obtener códigos pendientes y con error TEMPORAL filtrados por captura (NUEVO)
-  Future<List<ScanItem>> getPendingAndErrorItemsByCapture(String captureName) async {
+  // Obtener códigos pendientes y con error TEMPORAL filtrados por captura y employeeId
+  Future<List<ScanItem>> getPendingAndErrorItemsByCapture(String captureName, {required int employeeId}) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'scan_items',
-      where: 'captureName = ? AND (status = ? OR status = ?)',
-      whereArgs: [captureName, ScanStatus.pending.name, ScanStatus.failed_temporary.name],
+      where: 'captureName = ? AND employeeId = ? AND (status = ? OR status = ?)',
+      whereArgs: [captureName, employeeId, ScanStatus.pending.name, ScanStatus.failed_temporary.name],
       orderBy: 'scannedAt ASC',
     );
 
@@ -309,36 +346,36 @@ class DatabaseService {
     });
   }
 
-  // Eliminar todos los ítems de una captura específica (NUEVO)
-  Future<int> deleteItemsByCapture(String captureName) async {
+  // Eliminar todos los ítems de una captura específica del employeeId actual
+  Future<int> deleteItemsByCapture(String captureName, {required int employeeId}) async {
     final db = await database;
 
-    // Eliminar los ítems
+    // Eliminar los ítems del empleado actual
     final itemsDeleted = await db.delete(
       'scan_items',
-      where: 'captureName = ?',
-      whereArgs: [captureName],
+      where: 'captureName = ? AND employeeId = ?',
+      whereArgs: [captureName, employeeId],
     );
 
-    // Eliminar también de capturas validadas
+    // Eliminar también de capturas validadas del empleado actual
     await db.delete(
       'validated_captures',
-      where: 'captureName = ?',
-      whereArgs: [captureName],
+      where: 'captureName = ? AND employeeId = ?',
+      whereArgs: [captureName, employeeId],
     );
 
     return itemsDeleted;
   }
 
   // Eliminar solo los ítems/códigos de una captura (mantiene la captura validada)
-  Future<int> deleteOnlyItemsByCapture(String captureName) async {
+  Future<int> deleteOnlyItemsByCapture(String captureName, {required int employeeId}) async {
     final db = await database;
 
-    // Solo eliminar los ítems de scan_items, NO tocar validated_captures
+    // Solo eliminar los ítems de scan_items del empleado actual, NO tocar validated_captures
     final itemsDeleted = await db.delete(
       'scan_items',
-      where: 'captureName = ?',
-      whereArgs: [captureName],
+      where: 'captureName = ? AND employeeId = ?',
+      whereArgs: [captureName, employeeId],
     );
 
     return itemsDeleted;

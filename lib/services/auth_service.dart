@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:one_ztoc_app/services/storage_service.dart';
-import 'package:one_ztoc_app/services/database_service.dart';
 
 class AuthService {
   static const String baseUrl = 'https://demo19.digilab.pe';
   final StorageService _storageService = StorageService();
-  final DatabaseService _databaseService = DatabaseService();
 
   // Login - Flujo de Iniciar Sesión
   Future<Map<String, dynamic>> login({
@@ -35,10 +33,8 @@ class AuthService {
         final result = data['result'];
 
         if (result['success'] == true) {
-          // Limpiar la base de datos local de capturas anteriores
-          await _databaseService.clearDatabase();
-
           // Guardar token y datos del empleado
+          // NO limpiar la base de datos para mantener capturas entre sesiones
           await _storageService.saveUserData(
             accessToken: result['access_token'],
             employeeId: result['employee']['id'],
@@ -164,18 +160,17 @@ class AuthService {
         }
       }
 
-      // Siempre limpiar datos locales y base de datos
+      // Solo limpiar datos de autenticación (token, usuario)
+      // NO limpiar la base de datos de capturas para mantener persistencia
       await _storageService.clearUserData();
-      await _databaseService.clearDatabase();
 
       return {
         'success': true,
         'message': 'Sesión cerrada exitosamente',
       };
     } catch (e) {
-      // Aunque haya error, limpiamos localmente
+      // Aunque haya error, limpiamos datos de autenticación
       await _storageService.clearUserData();
-      await _databaseService.clearDatabase();
       return {
         'success': true,
         'message': 'Sesión cerrada exitosamente',

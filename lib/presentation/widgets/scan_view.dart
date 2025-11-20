@@ -30,6 +30,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
 
   String _userName = 'Usuario';
   String _userRole = 'Empleado';
+  int? _employeeId; // ID del empleado logueado
 
   @override
   bool get wantKeepAlive => true; // Mantener el estado al cambiar de pestañas
@@ -46,6 +47,7 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
       setState(() {
         _userName = userData['name'];
         _userRole = userData['job_title'];
+        _employeeId = userData['id'];
       });
     }
   }
@@ -101,10 +103,15 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
 
         // Guardar el código en la base de datos local como PENDING con la captura activa
         try {
+          if (_employeeId == null) {
+            throw Exception('No se pudo obtener el ID del empleado');
+          }
+
           await _dbService.insertScanItem(
             code,
             captureCode: _activeCaptureCode,
             captureName: _activeCaptureCode,
+            employeeId: _employeeId!,
           );
 
           if (mounted) {
@@ -139,7 +146,9 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
 
   void _onCaptureSelected(String captureCode, Map<String, dynamic> captureData) async {
     // Registrar la captura validada inmediatamente en la base de datos
-    await _dbService.registerValidatedCapture(captureCode);
+    if (_employeeId != null) {
+      await _dbService.registerValidatedCapture(captureCode, employeeId: _employeeId!);
+    }
 
     setState(() {
       _captureSelected = true;
@@ -234,11 +243,12 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
                 ),
                 child: _cameraActive
                     ? _buildCameraView()
-                    : (_showManualInput
+                    : (_showManualInput && _employeeId != null
                         ? ManualCodeInputView(
                             onClose: _toggleManualInput,
                             onCodeSubmitted: widget.onScanCompleted,
                             captureCode: _activeCaptureCode,
+                            employeeId: _employeeId!,
                           )
                         : _buildScanView()),
               ),

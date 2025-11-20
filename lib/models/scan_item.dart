@@ -19,6 +19,7 @@ class ScanItem {
   String? captureName;
   String? estado; // conciliado, sobrante, error_duplicado
   String? errorMessage; // Mensaje de error si falla
+  int? employeeId; // ID del empleado que escaneó
 
   ScanItem({
     this.id,
@@ -37,6 +38,7 @@ class ScanItem {
     this.captureName,
     this.estado,
     this.errorMessage,
+    this.employeeId,
   }) : scannedAt = scannedAt ?? DateTime.now();
 
   // Convertir de Map (de la base de datos) a ScanItem
@@ -61,6 +63,7 @@ class ScanItem {
       captureName: map['captureName'],
       estado: map['estado'],
       errorMessage: map['errorMessage'],
+      employeeId: map['employeeId'],
     );
   }
 
@@ -83,6 +86,7 @@ class ScanItem {
       'captureName': captureName,
       'estado': estado,
       'errorMessage': errorMessage,
+      'employeeId': employeeId,
     };
   }
 }
