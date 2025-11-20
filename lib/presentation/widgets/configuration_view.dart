@@ -11,7 +11,6 @@ class ConfigScreen extends StatefulWidget {
 
 class _ConfigScreenState extends State<ConfigScreen> {
   final _authService = AuthService();
-  bool _obscurePassword = true;
   bool _isLoggingOut = false;
 
   Future<void> _handleLogout() async {
@@ -504,30 +503,10 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               elevation: 0,
-              disabledBackgroundColor: const Color(0xFFEF4444).withOpacity(0.6),
+              disabledBackgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 20),
-          /* Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Color(0xFFFEF3C7),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1.5, color: Color.fromARGB(255, 215, 179, 36), style: BorderStyle.solid),
-            ),      
-            child: RichText(
-              text: TextSpan(
-                text: 'Nota: ',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: '''Asegurate de enviar todos tus pendientes luego de escanear antes de salir.''',
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)
-                  )
-                ]
-              )
-            ),
-          ) */
         ],
       ),
     );

@@ -20,7 +20,6 @@ class EscanearView extends StatefulWidget {
 class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClientMixin {
   bool _captureSelected = false; // Nueva variable para controlar si se seleccionó captura
   String _activeCaptureCode = ''; // Código de captura activo
-  Map<String, dynamic>? _activeCaptureData; // Datos completos de la captura
   bool _showManualInput = false;
   bool _cameraActive = false;
   MobileScannerController? _scannerController;
@@ -153,7 +152,6 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
     setState(() {
       _captureSelected = true;
       _activeCaptureCode = captureCode;
-      _activeCaptureData = captureData;
     });
 
     // Mostrar mensaje de éxito
@@ -172,7 +170,6 @@ class _EscanearViewState extends State<EscanearView> with AutomaticKeepAliveClie
     setState(() {
       _captureSelected = false;
       _activeCaptureCode = '';
-      _activeCaptureData = null;
       // También cerrar la cámara si está activa
       if (_cameraActive) {
         _deactivateCamera();

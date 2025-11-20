@@ -23,7 +23,7 @@ class _HistorialViewState extends State<HistorialView> {
   final DatabaseService _dbService = DatabaseService();
   final AuthService _authService = AuthService();
   List<Map<String, dynamic>> _captures = [];
-  Map<String, List<ScanItem>> _captureItems = {};
+  final Map<String, List<ScanItem>> _captureItems = {};
   bool _isLoading = true;
   String? _syncingCapture; // Captura que se está sincronizando actualmente
   int? _employeeId; // ID del empleado logueado
