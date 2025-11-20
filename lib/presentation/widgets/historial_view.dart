@@ -331,36 +331,25 @@ class _HistorialViewState extends State<HistorialView> {
         }
       }
 
-      // Paso 4: Mostrar éxito y preguntar si desea limpiar
+      // Paso 4: Mostrar mensaje de éxito
       if (!mounted) return;
 
-      final limpiar = await showDialog<bool>(
+      await showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Captura Finalizada'),
           content: Text(
             '✓ La captura "$captureName" se finalizó correctamente.\n\n'
-            '¿Desea eliminar los datos locales de esta captura?'
+            'Todos los bienes han sido enviados exitosamente.'
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Mantener'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
-              child: const Text('Eliminar'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
             ),
           ],
         ),
       );
-
-      if (limpiar == true && _employeeId != null) {
-        await _dbService.deleteItemsByCapture(captureName, employeeId: _employeeId!);
-      }
 
       if (!mounted) return;
 
