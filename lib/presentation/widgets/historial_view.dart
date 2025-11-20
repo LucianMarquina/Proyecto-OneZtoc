@@ -380,15 +380,16 @@ class _HistorialViewState extends State<HistorialView> {
     }
   }
 
-  // Limpiar (eliminar) todos los códigos de una captura
+  // Limpiar (eliminar) todos los códigos de una captura (mantiene la captura)
   Future<void> _limpiarCaptura(String captureName) async {
     // Confirmación
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Limpiar Captura'),
+        title: const Text('Limpiar Códigos'),
         content: Text(
           '¿Estás seguro de eliminar todos los códigos de la captura "$captureName"?\n\n'
+          'Esto borrará todos los ítems escaneados, pero la captura seguirá disponible para escanear nuevos códigos.\n\n'
           'Esta acción no se puede deshacer.'
         ),
         actions: [
@@ -401,7 +402,7 @@ class _HistorialViewState extends State<HistorialView> {
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Eliminar'),
+            child: const Text('Eliminar Códigos'),
           ),
         ],
       ),
@@ -410,8 +411,8 @@ class _HistorialViewState extends State<HistorialView> {
     if (confirm != true) return;
 
     try {
-      // Eliminar todos los ítems de la captura
-      await _dbService.deleteItemsByCapture(captureName);
+      // Eliminar solo los ítems/códigos, mantener la captura
+      await _dbService.deleteOnlyItemsByCapture(captureName);
 
       // Limpiar del cache
       _captureItems.remove(captureName);
@@ -423,7 +424,7 @@ class _HistorialViewState extends State<HistorialView> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ Captura "$captureName" eliminada'),
+          content: Text('✓ Códigos de "$captureName" eliminados'),
           backgroundColor: AppTheme.primaryColor,
           duration: const Duration(seconds: 2),
         ),
@@ -433,7 +434,7 @@ class _HistorialViewState extends State<HistorialView> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al eliminar: $e'),
+          content: Text('Error al eliminar códigos: $e'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
@@ -557,7 +558,7 @@ class _HistorialViewState extends State<HistorialView> {
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(                
+              decoration: BoxDecoration(
                 color: AppTheme.secondaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -590,6 +591,18 @@ class _HistorialViewState extends State<HistorialView> {
                   ),
                 ],
               ),
+            ),
+            // Ícono de tacho de basura para limpiar códigos
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+                size: 24,
+              ),
+              onPressed: () => _limpiarCaptura(captureName),
+              tooltip: 'Limpiar códigos',
+              padding: const EdgeInsets.all(8),
+              constraints: const BoxConstraints(),
             ),
           ],
         ),
@@ -660,32 +673,6 @@ class _HistorialViewState extends State<HistorialView> {
 
                         if (failedTemp > 0)
                           _buildMiniStatCard('Reintentar', failedTemp, Colors.orange),
-
-                        // Botón "Limpiar Captura"
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: () => _limpiarCaptura(captureName),
-                            icon: const Icon(Icons.delete_sweep_outlined, size: 20, color: Colors.white),
-                            label: const Text(
-                              'Limpiar Captura',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              side: const BorderSide(color: Colors.red, width: 1.5),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

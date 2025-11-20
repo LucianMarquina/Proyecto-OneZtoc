@@ -330,6 +330,20 @@ class DatabaseService {
     return itemsDeleted;
   }
 
+  // Eliminar solo los ítems/códigos de una captura (mantiene la captura validada)
+  Future<int> deleteOnlyItemsByCapture(String captureName) async {
+    final db = await database;
+
+    // Solo eliminar los ítems de scan_items, NO tocar validated_captures
+    final itemsDeleted = await db.delete(
+      'scan_items',
+      where: 'captureName = ?',
+      whereArgs: [captureName],
+    );
+
+    return itemsDeleted;
+  }
+
   // Cerrar la base de datos
   Future<void> close() async {
     final db = await database;

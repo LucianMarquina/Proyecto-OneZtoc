@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
 import 'package:one_ztoc_app/services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
