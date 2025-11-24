@@ -16,7 +16,10 @@ class ApiService {
   static final StorageService _storageService = StorageService();
 
   // Escanear un código de barras (AHORA RECIBE capture_code en lugar de capture_id)
-  static Future<Map<String, dynamic>> scanBarcode(String barcode, String captureCode) async {
+  static Future<Map<String, dynamic>> scanBarcode(
+    String barcode,
+    String captureCode,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl$scanEndpoint');
 
@@ -37,22 +40,22 @@ class ApiService {
         'capture_code': captureCode,
       };
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -120,22 +123,22 @@ class ApiService {
         'capture_code': captureCode,
       };
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -179,7 +182,9 @@ class ApiService {
   }
 
   // Verificar si quedan ítems pendientes (faltantes) en una captura (NUEVO)
-  static Future<Map<String, dynamic>> verificarPendientes(String captureCode) async {
+  static Future<Map<String, dynamic>> verificarPendientes(
+    String captureCode,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl$verificarPendientesEndpoint');
 
@@ -187,10 +192,7 @@ class ApiService {
       final accessToken = await _storageService.getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
-        return {
-          'success': false,
-          'message': 'Token de acceso no disponible',
-        };
+        return {'success': false, 'message': 'Token de acceso no disponible'};
       }
 
       final Map<String, dynamic> params = {
@@ -198,22 +200,22 @@ class ApiService {
         'capture_code': captureCode,
       };
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -254,7 +256,9 @@ class ApiService {
   }
 
   // Marcar todos los ítems pendientes como FALTANTES (NUEVO)
-  static Future<Map<String, dynamic>> marcarFaltantes(String captureCode) async {
+  static Future<Map<String, dynamic>> marcarFaltantes(
+    String captureCode,
+  ) async {
     try {
       final url = Uri.parse('$baseUrl$marcarFaltantesEndpoint');
 
@@ -262,10 +266,7 @@ class ApiService {
       final accessToken = await _storageService.getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
-        return {
-          'success': false,
-          'message': 'Token de acceso no disponible',
-        };
+        return {'success': false, 'message': 'Token de acceso no disponible'};
       }
 
       final Map<String, dynamic> params = {
@@ -273,22 +274,22 @@ class ApiService {
         'capture_code': captureCode,
       };
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -335,32 +336,27 @@ class ApiService {
       final accessToken = await _storageService.getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
-        return {
-          'success': false,
-          'message': 'Token de acceso no disponible',
-        };
+        return {'success': false, 'message': 'Token de acceso no disponible'};
       }
 
-      final Map<String, dynamic> params = {
-        'access_token': accessToken,
-      };
+      final Map<String, dynamic> params = {'access_token': accessToken};
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -369,10 +365,7 @@ class ApiService {
           final result = data['result'];
 
           if (result['success'] == true) {
-            return {
-              'success': true,
-              'stats': result['stats'] ?? {},
-            };
+            return {'success': true, 'stats': result['stats'] ?? {}};
           } else {
             return {
               'success': false,
@@ -415,22 +408,22 @@ class ApiService {
         'capture_id': captureId,
       };
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'jsonrpc': '2.0',
-          'method': 'call',
-          'params': params,
-        }),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: No se pudo conectar con el servidor');
-        },
-      );
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'jsonrpc': '2.0',
+              'method': 'call',
+              'params': params,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: No se pudo conectar con el servidor');
+            },
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -474,5 +467,4 @@ class ApiService {
       );
     }
   }
-
 }

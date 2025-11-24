@@ -15,24 +15,19 @@ class ActiveCaptureInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),      
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0xFFE2E8F0),
-            blurRadius: 1,
-          )
-        ],
+        boxShadow: const [BoxShadow(color: Color(0xFFE2E8F0), blurRadius: 1)],
       ),
-      child: Column(             
+      child: Column(
         children: [
           // Fila con ícono y texto de captura activa
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,            
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
                   width: 50,
@@ -85,10 +80,7 @@ class ActiveCaptureInfo extends StatelessWidget {
                 icon: const Icon(Icons.swap_horiz, size: 22),
                 label: const Text(
                   'Cambiar Captura',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.primaryColor,
