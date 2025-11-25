@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/services/auth_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/auth/services/auth_service.dart';
 
-class ConfigScreen extends StatefulWidget {
-  const ConfigScreen({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<ConfigScreen> createState() => _ConfigScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _ConfigScreenState extends State<ConfigScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   final _authService = AuthService();
   bool _isLoggingOut = false;
 

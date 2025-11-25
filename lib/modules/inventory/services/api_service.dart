@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:one_ztoc_app/models/faltante_item.dart';
-import 'package:one_ztoc_app/services/storage_service.dart';
+import 'package:one_ztoc_app/modules/inventory/models/faltante_item.dart';
+import 'package:one_ztoc_app/core/services/storage_service.dart';
 
 class ApiService {
   // URL hardcodeada para pruebas

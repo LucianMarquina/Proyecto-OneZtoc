@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/services/database_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/core/services/database_service.dart';
 
 class ManualCodeInputView extends StatefulWidget {
   final VoidCallback onClose;

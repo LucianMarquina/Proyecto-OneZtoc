@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/models/faltante_item.dart';
+import 'package:one_ztoc_app/modules/inventory/models/faltante_item.dart';
 
 class FaltanteListItem extends StatelessWidget {
   final FaltanteItem item;

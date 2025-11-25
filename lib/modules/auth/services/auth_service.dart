@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:one_ztoc_app/services/storage_service.dart';
+import 'package:one_ztoc_app/core/services/storage_service.dart';
 
 class AuthService {
   static const String baseUrl = 'https://demo19.digilab.pe';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
 
 class UserInfoWidget extends StatelessWidget {
   final String userName;

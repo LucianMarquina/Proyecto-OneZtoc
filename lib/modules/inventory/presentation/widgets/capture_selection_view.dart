@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/services/api_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/inventory/services/api_service.dart';
 
 class CaptureSelectionView extends StatefulWidget {
   final Function(String, Map<String, dynamic>) onCaptureSelected;

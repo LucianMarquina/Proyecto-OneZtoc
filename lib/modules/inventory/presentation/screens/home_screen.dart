@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/presentation/widgets/scan_view.dart';
-import 'package:one_ztoc_app/presentation/widgets/historial_view.dart';
-import 'package:one_ztoc_app/presentation/widgets/configuration_view.dart';
-import 'package:one_ztoc_app/services/auth_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/scan_view.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/historial_view.dart';
+import 'package:one_ztoc_app/modules/settings/presentation/settings_screen.dart';
+import 'package:one_ztoc_app/modules/auth/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             key: _historialKey,
             onTotalCountChanged: _updateTotalCount,
           ),
-          const ConfigScreen(),
+          const SettingsScreen(),
         ],
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/config/routes/app_routes.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/core/routes/app_routes.dart';
 
 void main() {
   runApp(const MyApp());

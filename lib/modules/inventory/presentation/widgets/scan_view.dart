@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/presentation/widgets/manual_code.dart';
-import 'package:one_ztoc_app/presentation/widgets/capture_selection_view.dart';
-import 'package:one_ztoc_app/presentation/widgets/active_capture_info.dart';
-import 'package:one_ztoc_app/presentation/widgets/user_info_widget.dart';
-import 'package:one_ztoc_app/services/database_service.dart';
-import 'package:one_ztoc_app/services/auth_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/manual_code.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/capture_selection_view.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/active_capture_info.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/user_info_widget.dart';
+import 'package:one_ztoc_app/core/services/database_service.dart';
+import 'package:one_ztoc_app/modules/auth/services/auth_service.dart';
 
 class EscanearView extends StatefulWidget {
   final VoidCallback? onScanCompleted; // Callback para notificar al padre

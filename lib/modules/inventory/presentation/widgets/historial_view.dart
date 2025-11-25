@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
-import 'package:one_ztoc_app/models/scan_item.dart';
-import 'package:one_ztoc_app/models/scan_status.dart';
-import 'package:one_ztoc_app/presentation/widgets/scan_history_item.dart';
-import 'package:one_ztoc_app/services/database_service.dart';
-import 'package:one_ztoc_app/services/api_service.dart';
-import 'package:one_ztoc_app/services/auth_service.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_item.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_status.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/widgets/scan_history_item.dart';
+import 'package:one_ztoc_app/core/services/database_service.dart';
+import 'package:one_ztoc_app/modules/inventory/services/api_service.dart';
+import 'package:one_ztoc_app/modules/auth/services/auth_service.dart';
 
 class HistorialView extends StatefulWidget {
   final Function(int) onTotalCountChanged;

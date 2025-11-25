@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/presentation/screens/splash_screen.dart';
-import 'package:one_ztoc_app/presentation/screens/login_screen.dart';
-import 'package:one_ztoc_app/presentation/screens/home_screen.dart';
+import 'package:one_ztoc_app/modules/auth/presentation/screens/splash_screen.dart';
+import 'package:one_ztoc_app/modules/auth/presentation/screens/login_screen.dart';
+import 'package:one_ztoc_app/modules/inventory/presentation/screens/home_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';

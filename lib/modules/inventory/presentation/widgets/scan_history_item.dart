@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:one_ztoc_app/models/scan_item.dart';
-import 'package:one_ztoc_app/config/theme/app_theme.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_item.dart';
+import 'package:one_ztoc_app/core/theme/app_theme.dart';
 
 class ScanHistoryItem extends StatelessWidget {
   final ScanItem item;

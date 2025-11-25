@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
-import 'package:one_ztoc_app/models/scan_item.dart';
-import 'package:one_ztoc_app/models/scan_status.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_item.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_status.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();

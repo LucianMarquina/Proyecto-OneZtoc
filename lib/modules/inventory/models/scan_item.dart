@@ -1,4 +1,4 @@
-import 'package:one_ztoc_app/models/scan_status.dart';
+import 'package:one_ztoc_app/modules/inventory/models/scan_status.dart';
 
 class ScanItem {
   final int? id; // ID de la base de datos local
