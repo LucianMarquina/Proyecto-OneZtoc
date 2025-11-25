@@ -1,6 +1,6 @@
-# Inventario 360
+# Inventario 360 Scan App
 
-**Inventario 360** es una solución móvil integral diseñada para optimizar y simplificar la gestión de inventarios. Con una interfaz moderna y fluida, esta aplicación permite a los usuarios mantener el control total de sus existencias en tiempo real.
+**Inventario 360 Scan App** es una solución móvil integral diseñada para optimizar y simplificar la gestión de inventarios. Con una interfaz moderna y fluida, esta aplicación permite a los usuarios mantener el control total de sus existencias en tiempo real.
 
 ---
 
