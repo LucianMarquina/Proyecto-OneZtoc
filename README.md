@@ -23,7 +23,7 @@
 
 ## Integración Odoo
 
-La aplicación utiliza una conexión directa con la API de Odoo (XML-RPC / JSON-RPC) para:
+La aplicación utiliza una conexión directa con la API de Odoo para:
 1.  Autenticar usuarios del sistema ERP.
 2.  Leer y escribir registros de productos e inventario.
 3.  Sincronizar movimientos de stock al instante.
@@ -31,4 +31,5 @@ La aplicación utiliza una conexión directa con la API de Odoo (XML-RPC / JSON-
 ---
 
 **Software Company**: Digilab Soluciones S.A.C.
+
 **Developer**: Alessandro Marquina
