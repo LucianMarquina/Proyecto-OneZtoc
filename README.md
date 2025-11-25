@@ -16,7 +16,7 @@
 ## Tecnologías Frontend e Integración Backend
 
 *   ![Flutter](https://img.shields.io/badge/Flutter-25A6D5?style=for-the-badge&logo=Flutter&logoColor=white)
-*   ![Odoo](https://img.shields.io/badge/Odoo-714B67?style=for-the-badge&logo=odoo&logoColor=white)
+*   ![Odoo](https://img.shields.io/badge/Odoo-714B67?style=for-the-badge)
 *   ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 ---
