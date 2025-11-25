@@ -16,15 +16,15 @@
 ## Tecnologías Frontend e Integración Backend
 
 <div align="center">
-  <a href="https://flutter.dev/">
+  <a href="https://storage.googleapis.com/cms-storage-bucket/a9d6ce81aee44ae017ee.png">
     <img src="https://storage.googleapis.com/cms-storage-bucket/a9d6ce81aee44ae017ee.png" alt="Flutter" height="60"/>
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://www.odoo.com/">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Odoo_logo.png/320px-Odoo_logo.png" alt="Odoo" height="60"/>
+  <a href="https://cdn.freebiesupply.com/logos/large/2x/odoo-logo-png-transparent.png">
+    <img src="https://cdn.freebiesupply.com/logos/large/2x/odoo-logo-png-transparent.png" alt="Odoo" height="60"/>
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://www.python.org/">
+  <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" alt="Python" height="60"/>
   </a>
 </div>
