@@ -13,14 +13,21 @@
 
 ---
 
-## Tecnologías Utilizadas
+## Tecnologías Frontend e Integración Backend
 
-Este proyecto ha sido desarrollado utilizando un stack tecnológico robusto y moderno:
-
-### Frontend (Móvil) and Backend
-*   **[Flutter](https://flutter.dev/)**
-*   **[Odoo](https://www.odoo.com/)**
-*   **[Python](https://www.python.org/)**
+<div align="center">
+  <a href="https://flutter.dev/">
+    <img src="https://storage.googleapis.com/cms-storage-bucket/a9d6ce81aee44ae017ee.png" alt="Flutter" height="60"/>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://www.odoo.com/">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Odoo_logo.png/320px-Odoo_logo.png" alt="Odoo" height="60"/>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://www.python.org/">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" alt="Python" height="60"/>
+  </a>
+</div>
 
 ---
 
@@ -33,4 +40,5 @@ La aplicación utiliza una conexión directa con la API de Odoo (XML-RPC / JSON-
 
 ---
 
-**Desarrollador**: Alessandro Marquina del equipo de Digilab.
+**Software Company**: Digilab Soluciones S.A.C.
+**Developer**: Alessandro Marquina
